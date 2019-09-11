@@ -2,16 +2,16 @@
     <div class='devops-header'>
         <div class='header-left-bar'>
             <router-link class='header-logo' to='/console/'>
-                <Logo name='service-logo' width='150' height='40' />
+                <Logo :name="$t('serviceLogo')" :width="$t('serviceLogo') === 'service-logo-en' ? 200 : 150" height='40' />
             </router-link>
-            <bk-dropdown ref='projectDropdown' v-if='showProjectList' class='devops-project-dropdown' :list='selectProjectList' :selected='projectId' placeholder='请选择项目' displayKey='project_name' settingKey='project_code' searchKey='project_name' :searchable='true' @visible-toggle='handleDropdownVisible' @item-selected='handleProjectChange' :has-create-item='true'>
+            <bk-dropdown ref='projectDropdown' v-if='showProjectList' class='devops-project-dropdown' :list='selectProjectList' :selected='projectId' :placeholder="$t('chooseProject')" displayKey='project_name' settingKey='project_code' searchKey='project_name' :searchable='true' @visible-toggle='handleDropdownVisible' @item-selected='handleProjectChange' :has-create-item='true'>
                 <div class="bk-selector-create-item" @click.stop.prevent="popProjectDialog()">
                     <i class="bk-icon icon-plus-circle"></i>
-                    <i class="text">新建项目</i>
+                    <i class="text">{{ $t('addProject') }}</i>
                 </div>
                 <div class="bk-selector-create-item" @click.stop.prevent="goToPm">
                     <i class="bk-icon icon-apps"></i>
-                    <i class="text">项目管理</i>
+                    <i class="text">{{ $t('projectTitle') }}</i>
                 </div>
             </bk-dropdown>
 
@@ -83,7 +83,6 @@ export default class Header extends Vue {
         return this.$route.params.projectId
     }
     get title(): string {
-        console.log(this.$route.meta)
         return this.$route.meta.header
     }
     get serviceLogo(): string {
@@ -93,16 +92,16 @@ export default class Header extends Vue {
     get serviceList(): object[] {
         return [
             {
-                name: '容器服务',
+                name: this.$t('bcsName'),
                 key: 'bcs',
-                isActive: this.title === '容器服务',
-                action: this.title === '容器服务' ? this.goHome : this.goConitor
+                isActive: this.title === this.$t('bcsName'),
+                action: this.goConitor
             },
             {
-                name: '监控中心',
+                name: this.$t('monitorName'),
                 key: 'monitor',
-                isActive: this.title === '监控中心',
-                action: this.title === '监控中心' ? this.goHome : this.goConitor
+                isActive: this.title === this.$t('monitorName'),
+                action: this.goConitor
             }
         ]
     }
@@ -182,19 +181,12 @@ export default class Header extends Vue {
         const { projectId } = this.$route.params
         if (projectId && this.selectProjectList.every(project => project.project_code !== projectId)) {
             //当前无权限时返回首页
-            if (this.$route.name === 'codecc') {
-                // todo
-                this.$router.replace({
-                    path: `/console/codecc/${id}/coverity/myproject`
-                })
-            } else {
-                this.$router.replace({
-                    name: this.$route.name,
-                    params: {
-                        projectId: id
-                    }
-                })
-            }
+            this.$router.replace({
+                name: this.$route.name,
+                params: {
+                    projectId: id
+                }
+            })
         } else {
             this.$router.replace({
                 params: {

@@ -16,32 +16,9 @@ import {
 } from '../store/constants'
 import eventBus from './eventBus'
 
-
 const customeRules = {
-    string: {
-        getMessage: field => `非法的${field}`,
-        validate: function (value, args) {
-            return /^[\w,\d,\-_\(\)]+$/i.test(value)
-        }
-    },
-    aliasUnique: { //较验代码库别名
-        getMessage: field => '代码库别名不能重复',
-        validate: function (value, [projectId, repositoryHashId]) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    const response = await eventBus.$ajax.get(`${REPOSITORY_API_URL_PREFIX}/user/repositories/${projectId}/hasAliasName?aliasName=${value}${repositoryHashId ? `&repositoryHashId=${repositoryHashId}` : ''}`)
-                    resolve({
-                        valid: !response
-                    })
-                } catch (e) {
-                    console.log(e)
-                    reject(e)
-                }
-            })
-        }
-    },
     projectNameUnique: { //较验项目名称是否重复
-        getMessage: field => '项目名称已存在',
+        // getMessage: field => '项目名称已存在',
         validate: function (value, [projectId]) {
             return new Promise(async (resolve, reject) => {
                 try {
@@ -61,7 +38,7 @@ const customeRules = {
     },
 
     projectEnglishNameUnique: { //较验项目英文名称是否重复
-        getMessage: field => '英文缩写已存在',
+        // getMessage: field => '英文缩写已存在',
         validate: function (value) {
             return new Promise(async (resolve, reject) => {
                 try {
@@ -80,7 +57,7 @@ const customeRules = {
     },
 
     projectEnglishNameReg: { //较验项目英文名称格式
-        getMessage: field => '英文缩写必须由小写字母+数字组成，以小写字母开头，长度限制32字符！',
+        // getMessage: field => '英文缩写必须由小写字母+数字组成，以小写字母开头，长度限制2-32字符！',
         validate: function (value) {
             return /^[a-z][a-z0-9]{1,32}$/.test(value)
         }

@@ -3,7 +3,7 @@
         <div class="biz-pm biz-pm-index biz-create-pm">
             <template v-if="projectList.length || isDataLoading">
                 <div class="biz-pm-header">
-                    <div class="title">项目管理</div>
+                    <div class="title">{{ $t('projectTitle') }}</div>
                     <div class="action">
                         <!-- <label class="bk-form-checkbox bk-checkbox-small">
                             <input type="checkbox" value="1" name="isFilterByOffline" v-model="isFilterByOffline">
@@ -11,12 +11,10 @@
                         </label> -->
                         <button class="bk-button bk-primary" @click="togglePMDialog(true)">
                             <i class="bk-icon icon-plus"></i>
-                            <span style="margin-left: 0;">新建项目</span>
+                            <span style="margin-left: 0;">{{ $t('addProject') }}</span>
                         </button>
                         <div class="search-input-row">
-                            <input type="text" name="searchInput" placeholder="输入关键字按Enter搜索" v-model="inputValue" @keyup.enter="filterProjectList(isFilterByOffline)">
-                            <!-- <i v-if="inputValue" class="bk-icon icon-close-circle-shape"></i>
-                            <i v-else class="bk-icon icon-search" @click="filterProjectList(isFilterByOffline)"></i> -->
+                            <input type="text" name="searchInput" :placeholder="$t('searchTips')" v-model="inputValue" @keyup.enter="filterProjectList(isFilterByOffline)">
                             <a href="javascript:void(0)" class="biz-search-btn">
                                 <i v-if="inputValue" class="bk-icon icon-close-circle-shape" @click="clearFilter"></i>
                                 <i v-else class="bk-icon icon-search" @click="filterProjectList(isFilterByOffline)"></i>
@@ -28,11 +26,11 @@
                     <table class="bk-table has-table-hover biz-table biz-pm-table">
                         <thead>
                             <tr>
-                                <th style="width: 300px;border-bottom:none">项目名称</th>
-                                <th style="width: 300px;border-bottom:none">项目英文名</th>
-                                <th>项目说明</th>
-                                <th style="width: 170px;">创建者</th>
-                                <th style="width: 200px; text-align: center;">操作</th>
+                                <th style="width: 300px;border-bottom:none">{{ $t('projectTable.name') }}</th>
+                                <th style="width: 300px;border-bottom:none">{{ $t('projectTable.englishName') }}</th>
+                                <th>{{ $t('projectTable.desc') }}</th>
+                                <th style="width: 170px;">{{ $t('projectTable.creator') }}</th>
+                                <th style="width: 200px; text-align: center;">{{ $t('projectTable.operation') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -50,17 +48,7 @@
                                     </span>
                                     <div class="info">
                                         <p class="title">
-                                            <template v-if="project.approval_status !== 2">
-                                                <bk-tooltip :content="'没有操作权限'" placement="top">
-                                                    <a href="javascript:void(0)" class="bk-text-button is-disabled" title="没有操作权限">{{project.project_name}}</a>
-                                                </bk-tooltip>
-                                            </template>
-                                            <!-- <template v-else-if="project.permissions['modify:project:btn'] === 2">
-                                                <bk-tooltip :content="'没有操作权限'" placement="top">
-                                                    <a href="javascript:void(0)" class="bk-text-button is-disabled" title="没有操作权限">{{project.project_name}}</a>
-                                                </bk-tooltip>
-                                            </template> -->
-                                            <template v-else>
+                                            <template>
                                                 <a href="javascript:void(0)" @click.stop.prevent="goProject(project.project_code)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" v-if="!project.is_offlined">{{project.project_name}}</a>
                                                 <a href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" v-else>{{project.project_name}}</a>
                                             </template>
@@ -78,53 +66,9 @@
                                     <p class="desc">{{project.creator}}</p>
                                 </td>
                                 <td class="action">
-                                    <!-- 状态为待审批 -->
-                                    <template v-if="project.approval_status === 1">
-                                        <bk-tooltip :content="'待审批，没有操作权限'" placement="top">
-                                            <a href="javascript:void(0)" class="bk-text-button is-disabled" title="没有操作权限">编辑</a>
-                                        </bk-tooltip>
-                                        <!-- <bk-tooltip :content="'待审批，没有操作权限'" placement="top" style="margin: 0 15px;">
-                                            <a href="javascript:void(0)" class="bk-text-button is-disabled" title="没有操作权限">启用</a>
-                                        </bk-tooltip> -->
-                                        <bk-tooltip :content="'待审批，没有操作权限'" placement="top">
-                                            <a href="javascript:void(0)" class="bk-text-button is-disabled" title="没有操作权限">权限管理</a>
-                                        </bk-tooltip>
-                                    </template>
-                                    <!-- 状态为已驳回 -->
-                                    <template v-else-if="project.approval_status === 3">
-                                        <a href="javascript:void(0)" :class="['bk-text-button']" @click.stop.prevent="togglePMDialog(true, project)">编辑</a>
-                                        <!-- <bk-tooltip :content="'已驳回，没有操作权限'" placement="top" style="margin: 0 15px;">
-                                            <a href="javascript:void(0)" class="bk-text-button is-disabled" title="没有操作权限">启用</a>
-                                        </bk-tooltip> -->
-                                        <bk-tooltip :content="'已驳回，没有操作权限'" placement="top">
-                                            <a href="javascript:void(0)" class="bk-text-button is-disabled" title="没有操作权限">权限管理</a>
-                                        </bk-tooltip>
-                                    </template>
-                                    <!-- 没操作权限 置灰 -->
-                                    <!-- <template v-else-if="project.permissions['modify:project:btn'] === 2">
-                                        <bk-tooltip :content="'没有操作权限'" placement="top">
-                                            <a href="javascript:void(0)" class="bk-text-button is-disabled" title="没有操作权限">编辑</a>
-                                        </bk-tooltip>
-                                        <bk-tooltip :content="project.is_offlined?'没有操作权限':'此功能暂未开放'" placement="top">
-                                            <a href="javascript:void(0)" style="margin-left: 15px;" class="bk-text-button is-disabled">{{project.is_offlined? '启用' : '停用'}}</a>
-                                        </bk-tooltip>
-                                        <bk-tooltip :content="'没有操作权限'" placement="top">
-                                            <a href="javascript:void(0)" style="margin-left: 15px;" class="bk-text-button is-disabled" title="没有操作权限">权限管理</a>
-                                        </bk-tooltip>
-                                    </template> -->
-                                    <!-- 否则正常显示 -->
-                                    <template v-else>
-                                        <a href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" @click.stop.prevent="togglePMDialog(true, project)">编辑</a>
-                                        <!-- <template v-if="project.is_offlined">
-                                            <a href="javascript:void(0)" class="bk-text-button" @click.stop.prevent="offlineProject(project)">启用</a>
-                                        </template>
-                                        <template v-else>
-                                            <bk-tooltip :content="'此功能暂未开放'" placement="top">
-                                                <a href="javascript:void(0)" style="margin: 0 15px;" class="bk-text-button is-disabled">停用</a>
-                                            </bk-tooltip>
-                                        </template> -->
-                                        <a href="javascript:void(0)" @click="goUserManager(project.project_code)" class="bk-text-button" v-if="!project.is_offlined">权限管理</a>
-                                        <a href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" v-else>权限管理</a>
+                                    <template>
+                                        <a href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" @click.stop.prevent="togglePMDialog(true, project)">{{ $t('projectTable.edit') }}</a>
+                                        <a href="javascript:void(0)" @click="goUserManager(project.project_code)" class="bk-text-button">{{ $t('projectTable.auth') }}</a>
                                     </template>
                                 </td>
                             </tr>
@@ -241,7 +185,7 @@ export default class ProjectManage extends Vue {
         } else {
             this.curProjectList = this.projectList.filter(project => {
                 return (
-                    project.is_offlined === false &&
+                    // project.is_offlined === false &&
                     project.project_name.indexOf(this.inputValue) !== -1 &&
                     project.approval_status !== 3
                 )
