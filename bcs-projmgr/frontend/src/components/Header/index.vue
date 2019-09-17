@@ -95,13 +95,13 @@ export default class Header extends Vue {
                 name: this.$t('bcsName'),
                 key: 'bcs',
                 isActive: this.title === this.$t('bcsName'),
-                action: this.goConitor
+                action: this.title === this.$t('bcsName') ? this.goHome : this.goConitor
             },
             {
                 name: this.$t('monitorName'),
                 key: 'monitor',
                 isActive: this.title === this.$t('monitorName'),
-                action: this.goConitor
+                action: this.title === this.$t('monitorName') ? this.goHome : this.goConitor
             }
         ]
     }
