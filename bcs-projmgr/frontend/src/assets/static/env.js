@@ -15,6 +15,6 @@ var GW_URL_PREFIX = 'http://api.dev.bcs.bk.com' // api接口前缀
 var DEVOPS_LS_VERSION = 'dev' // 最近访问服务版本
 var AUTHORITY_CENTER_URL = 'http://paas.bk.com/o/bk_iam_app'
 var BCS_DOCS_URL = 'https://bk.tencent.com/docs/' // 容器文档地址s
-var BCS_IFRAME_URL = "http://bcs.bk.com" //容器服务iframe地址
+var BCS_IFRAME_URL = "http://bcs.bk.com/o/bk_bcs_app" //容器服务iframe地址
 
 var MONITOR_IFRAME_URL = "http://paas.bk.com/o/bk_bcs_monitor" //监控中心服务地址
