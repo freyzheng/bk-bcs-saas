@@ -8,7 +8,7 @@ export default {
     editProject: 'Edit project',
     chooseProject: 'Please choose a project',
     searchTips: 'Enter keywords and press Enter to search',
-    logout: '退出',
+    logout: 'logout',
     projectTable: {
         name: 'project name',
         englishName: 'english name',
@@ -41,7 +41,10 @@ export default {
         joinProject: 'Join the project',
         noPermissionTitlePrefix: 'No permission for ',
         noPermissionTitleSuffix: ' project, or the project does not exist',
-        noPermissionDesc: 'Please try to switch another project, or join the project'
+        noPermissionDesc: 'Please try to switch another project, or join the project',
+        noFoundProject: 'Temporarily no data',
+        noProjectTitle: 'Did not find the project you joined',
+        npProjectDesc: 'You can create your own project or apply to join an existing project'
     },
     flowTips: {
         websiteUrl: 'Blueking offcial website',

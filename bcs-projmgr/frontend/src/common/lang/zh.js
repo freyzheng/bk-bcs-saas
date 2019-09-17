@@ -4,7 +4,7 @@ export default {
     monitorName: '监控中心',
     projectTitle: '项目管理',
     authTitle: '权限中心',
-    addProject: '新增项目',
+    addProject: '新建项目',
     editProject: '编辑项目',
     chooseProject: '请选择项目',
     searchTips: '输入关键字按Enter搜索',
@@ -41,7 +41,10 @@ export default {
         joinProject: '申请加入',
         noPermissionTitlePrefix: '无',
         noPermissionTitleSuffix: '项目权限或者项目不存在',
-        noPermissionDesc: '请切换项目试试，或申请加入该项目'
+        noPermissionDesc: '请切换项目试试，或申请加入该项目',
+        noFoundProject: '暂时没有数据！',
+        noProjectTitle: '未找到您参与的项目',
+        npProjectDesc: '您可以创建自己的项目，也可以申请加入已有的项目'
     },
     flowTips: {
         websiteUrl: '蓝鲸官网',

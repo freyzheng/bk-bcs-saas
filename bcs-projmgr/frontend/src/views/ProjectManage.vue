@@ -5,10 +5,6 @@
                 <div class="biz-pm-header">
                     <div class="title">{{ $t('projectTitle') }}</div>
                     <div class="action">
-                        <!-- <label class="bk-form-checkbox bk-checkbox-small">
-                            <input type="checkbox" value="1" name="isFilterByOffline" v-model="isFilterByOffline">
-                            <i class="bk-checkbox-text">显示已停用项目</i>
-                        </label> -->
                         <button class="bk-button bk-primary" @click="togglePMDialog(true)">
                             <i class="bk-icon icon-plus"></i>
                             <span style="margin-left: 0;">{{ $t('addProject') }}</span>
@@ -81,18 +77,17 @@
                 </template>
                 <template v-else>
                     <div class="biz-guide-box" v-show="!isDataLoading">
-                        <p class="title" v-if="!isFilterByOffline && offlineProjectNum">您有{{offlineProjectNum}}个项目已经停用，请点击右上角“显示已停用项目”或新建项目</p>
-                        <p class="title" v-else>暂时没有数据！</p>
+                        <p class="title">{{ $t('pageTips.noFoundProject') }}</p>
                     </div>
                 </template>
             </template>
-            <empty-tips v-else title='未找到您参与的项目' desc='您可以创建自己的项目，然后针对自己的项目进行相应用户和权限管理，也可以申请加入已有的项目'>
+            <empty-tips v-else :title="$t('pageTips.noProjectTitle')" :desc="$t('pageTips.noProjectDesc')">
                 <button class="bk-button bk-primary" @click="togglePMDialog(true)">
                     <i class="bk-icon icon-plus"></i>
-                    <span style="margin-left: 0;">新建项目</span>
+                    <span style="margin-left: 0;">{{ $t('addProject') }}</span>
                 </button>
                 <a class="bk-button bk-success" :href="applyProjectUrl">
-                    <span style="margin-left: 0;">申请加入项目</span>
+                    <span style="margin-left: 0;">{{ $t('pageTips.joinProject') }}</span>
                 </a>
             </empty-tips>
         </div>
@@ -399,7 +394,7 @@ export default class ProjectManage extends Vue {
 
             this.$bkMessage({
                 theme: 'success',
-                message: '项目修改成功！'
+                message: this.$t('projectDialog.saveSuccessTips')
             })
             this.togglePMDialog(false)
             this.getProjects()

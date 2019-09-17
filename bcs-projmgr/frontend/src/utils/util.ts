@@ -169,3 +169,16 @@ export function getServiceAliasByPath (path: string): string {
     const serviceAliasREG = /^\/(console\/)?(\w+)\S*$/
     return path.replace(serviceAliasREG, '$2')
 }
+
+export function getAuthPermissionItem (obj) {
+    const item = (typeof obj === 'object') ? obj : {}
+    const base = {
+        "system_id": "bk_bcs_app",
+        "scope_id": "bk_bcs_app",
+        "scope_type": "system",
+        "resource_type": "bcs_project",
+        "action_id": 'view',
+        "resource": []
+    }
+    return Object.assign(base, item)
+}
