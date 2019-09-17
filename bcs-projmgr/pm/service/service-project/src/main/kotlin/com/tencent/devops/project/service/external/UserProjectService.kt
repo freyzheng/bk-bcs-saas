@@ -17,10 +17,7 @@ import com.tencent.devops.common.api.exception.OperationException
 import com.tencent.devops.common.api.util.DateTimeUtil
 import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.model.project.tables.records.TProjectRecord
-import com.tencent.devops.project.api.XBkAuthResourceApi
-import com.tencent.devops.project.api.XBkAuthResourceType
-import com.tencent.devops.project.api.XBkAuthScopeType
-import com.tencent.devops.project.api.XBkAuthSystemCode
+import com.tencent.devops.project.api.*
 import com.tencent.devops.project.dao.ProjectDao
 import com.tencent.devops.project.jmx.api.JmxApi
 import com.tencent.devops.project.pojo.*
@@ -48,6 +45,7 @@ import javax.ws.rs.core.Response
 @Service
 class UserProjectService constructor(
         private val xBkAuthResourceApi: XBkAuthResourceApi,
+        private val xBkAuthPermissionApi: XBkAuthPermissionApi,
         private val dslContext: DSLContext,
         private val projectDao: ProjectDao,
         private val jmxApi: JmxApi,
@@ -59,28 +57,47 @@ class UserProjectService constructor(
         const val ENGLISH_NAME_PATTERN = "[a-z][a-zA-Z0-9]+"
     }
 
-    fun getPxternalProjectList(bkToken: String): List<ProjectVO> {
+    fun getExternalProjectList(bkToken: String): List<ProjectVO> {
         val userId = xBkAuthResourceApi.getBkUsername(bkToken)
         val startEpoch = System.currentTimeMillis()
         var success = false
         try {
-            val resourceIdList = xBkAuthResourceApi.getUserAuthorizedScopes(userId)
-            if (resourceIdList.bk_error_code != 0) {
-                logger.warn("Fail to get the project info with response $resourceIdList")
-                throw OperationException("从权限中心获取用户的项目信息失败")
-            }
-            if (resourceIdList.data == null) {
-                return emptyList()
-            }
 
-            val englishNameList = resourceIdList.data.map {
-                it.split(":")[1]
-            }
+            val map = xBkAuthPermissionApi.getUserResourcesByPermissions(
+                    userId = userId,
+                    userType = "user",
+                    scopeType = XBkAuthScopeType.SYSTEM,
+                    resourceType = XBkAuthResourceType.PROJECT,
+                    permissions = setOf(XBkAuthPermission.MANAGE),
+                    systemCode = XBkAuthSystemCode.DEVOPS_PROJECT,
+                    supplier = null
+            )
+            val englishNameList = mutableListOf<String>()
+            map.map { englishNameList.addAll(it.value) }
+//            不再从iam获取项目信息
+//            val resourceIdList = xBkAuthResourceApi.getUserAuthorizedScopes(userId)
+//            if (resourceIdList.bk_error_code != 0) {
+//                logger.warn("Fail to get the project info with response $resourceIdList")
+//                throw OperationException("从权限中心获取用户的项目信息失败")
+//            }
+//            if (resourceIdList.data == null) {
+//                return emptyList()
+//            }
+//
+//            val englishNameList = resourceIdList.data.map
+//                it.split(":")[1]
+//            }
             val list = ArrayList<ProjectVO>()
-
             projectDao.listByEnglishName(dslContext, englishNameList).map {
                 list.add(packagingBean(it))
             }
+
+            projectDao.listAll(dslContext).map {
+                if(!englishNameList.contains(it.englishName)) {
+                    list.add(packagingBean(it,false))
+                }
+            }
+
             success = true
             return list
         } catch (e: Exception) {
@@ -93,7 +110,7 @@ class UserProjectService constructor(
     }
 
 
-    fun getPxternalAllProjectList(bkToken: String): List<ProjectVO> {
+    fun getExternalAllProjectList(bkToken: String): List<ProjectVO> {
         val startEpoch = System.currentTimeMillis()
         var success = false
         try {
@@ -112,7 +129,7 @@ class UserProjectService constructor(
         }
     }
 
-    fun getPxternalProject(bkToken: String, projectId: String): ProjectVO? {
+    fun getExternalProject(bkToken: String, projectId: String): ProjectVO? {
         val startEpoch = System.currentTimeMillis()
         var success = false
         try {
@@ -133,7 +150,7 @@ class UserProjectService constructor(
     }
 
 
-    fun getPxternalProjectByCode(bkToken: String, projectCode: String): ProjectVO? {
+    fun getExternalProjectByCode(bkToken: String, projectCode: String): ProjectVO? {
         val startEpoch = System.currentTimeMillis()
         var success = false
         try {
@@ -169,10 +186,16 @@ class UserProjectService constructor(
                 val logoAddress = ""
 
                 // 注册项目到权限中心
-                val resourceId = XBkAuthResourceType.PROJECT.value + ":" + projectCreateInfo.english_name
-                xBkAuthResourceApi.createResource(XBkAuthSystemCode.DEVOPS_PROJECT, "user", userId,
-                        XBkAuthScopeType.SYSTEM, XBkAuthSystemCode.DEVOPS_PROJECT.value,
-                        XBkAuthResourceType.PROJECT, resourceId, projectCreateInfo.project_name)
+                val resourceId = projectCreateInfo.english_name
+                xBkAuthResourceApi.createResource(
+                        XBkAuthSystemCode.DEVOPS_PROJECT,
+                        "user", userId,
+                        XBkAuthScopeType.SYSTEM,
+                        XBkAuthSystemCode.DEVOPS_PROJECT.value,
+                        XBkAuthResourceType.PROJECT,
+                        resourceId,
+                        projectCreateInfo.project_name
+                )
 
                 val projectId = UUIDUtil.generate()
                 //   val userDeptDetail = tofService.getUserDeptDetail(userId, "") // 获取用户机构信息
@@ -227,7 +250,7 @@ class UserProjectService constructor(
         var success = false
         val tProjectRecord = projectDao.get(dslContext, projectId)
         if (tProjectRecord != null && tProjectRecord.englishName != null) {
-            val resourceId = XBkAuthResourceType.PROJECT.value + ":" + projectUpdateInfo.english_name
+            val resourceId = projectUpdateInfo.english_name
             try {
                 try {
                     dslContext.transaction { configuration ->
@@ -368,7 +391,7 @@ class UserProjectService constructor(
         return logo
     }
 
-    private fun packagingBean(tProjectRecord: TProjectRecord): ProjectVO {
+    private fun packagingBean(tProjectRecord: TProjectRecord,permission: Boolean? = true): ProjectVO {
         return ProjectVO(
                 tProjectRecord.id,
                 tProjectRecord.projectId ?: "",
@@ -409,7 +432,8 @@ class UserProjectService constructor(
                 },
                 tProjectRecord.useBk,
                 tProjectRecord.enabled ?: false,
-                false
+                false,
+                permission
         )
     }
 

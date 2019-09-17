@@ -30,20 +30,20 @@ consul进程启动分为2种方式：Client模式、Server模式。
 
 ***本地开发启动服务器模式即可***。
 
-- consul server启动(IP:10.10.10.1)
+- consul server启动(IP:127.0.0.1)
 
 ```shell
 sudo consul agent -server -data-dir=__CONSUL_DATA_DIR__ -ui -bootstrap -datacenter=__CONSUL_DATACENTER__ -domain=__CONSUL_DOMAIN__ -bootstrap -client=0.0.0.0 -bind=__LOCALHOST_IP__
 # 例子：
-sudo consul agent -server -data-dir=/data/consul -ui -bootstrap -datacenter=bkdevops -domain=bkdevops -bootstrap -client=0.0.0.0 -bind=10.10.10.1
+sudo consul agent -server -data-dir=/data/consul -ui -bootstrap -datacenter=bkdevops -domain=bkdevops -bootstrap -client=0.0.0.0 -bind=127.0.0.1
 ```
 
-- consul client启动(IP:10.10.10.2)
+- consul client启动(IP:127.0.0.2)
 
 ```shell
 sudo consul agent -data-dir=__CONSUL_DATA_DIR__ -datacenter=__CONSUL_DATACENTER__ -domain=__CONSUL_DOMAIN__ -join=__CONSUL_SERVER_IP__ -bind=__LOCALHOST_IP__
 # 例子：
-sudo consul agent -data-dir=/data/consul -datacenter=enterprise -domain=bkdevops -join=10.10.10.1 -bind=10.10.10.2
+sudo consul agent -data-dir=/data/consul -datacenter=enterprise -domain=bkdevops -join=127.0.0.1 -bind=127.0.0.2
 ```
 
 #### 3.本地开发参数配置说明
@@ -91,13 +91,13 @@ consul启动成功后，可以通过页面来查看相关信息。[Consul管理�
 
 | 变量名 | 说明 |
 |-------|------|
-| __DEVOPS_HOST__ | 项目管理页面域名,默认值"dev.devops.bk.com" |
+| __DEVOPS_HOST__ | 项目管理页面域名,默认值"dev.bcs.bk.com" |
 
 - 修改`/usr/local/etc/openresty/nginx/conf/frontend.conf.tpl` 中变量的值,并替换`/usr/local/etc/openresty/nginx/conf/frontend.conf`文件，变量说明如下：
 
 | 变量名 | 说明 |
 |-------|------|
-| __DEVOPS_API_FQDN__ | 项目管理的后台接口域名,默认值"api.dev.devops.bk.com" |
+| __DEVOPS_API_FQDN__ | 项目管理的后台接口域名,默认值"api.dev.bcs.bk.com" |
 
 - 修改 `/usr/local/etc/openresty/nginx/conf/devops.ssl.tpl` 中变量的值，并替换`/usr/local/etc/openresty/nginx/conf/devops.ssl`文件，变量说明如下：
 
@@ -115,7 +115,7 @@ consul启动成功后，可以通过页面来查看相关信息。[Consul管理�
 
 #### 5.打开项目管理页面
 
-打开 http://dev.devops.bk.com 即可进入项目管理页面。
+打开 http://dev.bcs.bk.com 即可进入项目管理页面。
 
 ---
 
@@ -137,7 +137,7 @@ npm install .
 
 | 变量名 | 说明 |
 |-------|------|
-| __DEVOPS_API_FQDN__ | 项目管理的后台接口域名,默认值"api.dev.devops.bk.com" |
+| __DEVOPS_API_FQDN__ | 项目管理的后台接口域名,默认值"api.dev.bcs.bk.com" |
 | __PAAS_FQDN__ | 蓝鲸PAAS的外部域名,默认值"paas.bk.com" |
 | __BCS_APP_FQDN__ | BCS APP的本地访问域名,默认值"bcs.bk.com" |
 

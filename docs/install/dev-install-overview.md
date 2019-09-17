@@ -25,8 +25,8 @@ APIGW_HOST=http://paas.service.consul                      # 社区版APIGW地�
 
 # 本地开发域名，配置成127.0.0.1
 # 二级域名需要和社区版PaaS一致(如bk.com)
-DEV_DEVOPS_HOST=http://dev.devops.bk.com                   # 容器管理平台SaaS首页
-DEV_DEVOPS_API_HOST=http://api.dev.devops.bk.com           # bcs-projmgr后台api地址
+DEV_DEVOPS_HOST=http://dev.bcs.bk.com                   # 容器管理平台SaaS首页
+DEV_DEVOPS_API_HOST=http://api.dev.bcs.bk.com           # bcs-projmgr后台api地址
 DEV_BCS_APP_HOST=http://dev.paas.bk.com:8000               # bcs-app地址
 
 # bcs-app 配置
