@@ -15,7 +15,7 @@ export default {
         desc: 'description',
         creator: 'creator',
         operation: 'operation',
-        edit: 'edit',
+        edit: 'Edit project',
         auth: 'auth'
     },
     projectDialog: {

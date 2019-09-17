@@ -72,7 +72,7 @@ export default class User extends Vue {
                     label: this.$t('projectTitle')
                 },
                 {
-                    open: AUTHORITY_CENTER_URL,
+                    open: `${AUTHORITY_CENTER_URL}/my-perm`,
                     label: this.$t('authTitle')
                 },
                 {

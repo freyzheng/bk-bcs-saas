@@ -15,7 +15,7 @@ export default {
         desc: '项目说明',
         creator: '创建者',
         operation: '操作',
-        edit: '编辑',
+        edit: '编辑项目',
         auth: '权限管理'
     },
     projectDialog: {

@@ -7,9 +7,7 @@
                     <empty-tips v-if='!hasProject' :title="`${$t('pageTips.noPermissionTitlePrefix')}${hrefProjectId}${$t('pageTips.noPermissionTitleSuffix')}`" :desc="$t('pageTips.noPermissionDesc')">
 
                         <bk-button type='primary' @click='switchProject'>{{ $t('pageTips.switchProject') }}</bk-button>
-                        <a target="_blank" class='empty-btns-item' :href="permUrl">
-                            <bk-button type='success'>{{ $t('pageTips.joinProject') }}</bk-button>
-                        </a>
+                        <bk-button type='success' @click='joinProject'>{{ $t('pageTips.joinProject') }}</bk-button>
                     </empty-tips>
 
                     <!--<empty-tips v-else-if='isOfflineProject' title='项目已禁用' desc='该项目已被禁用，请切换项目试试，或重新启用该项目'>
@@ -38,7 +36,7 @@ import LoginDialog from '../components/LoginDialog'
 import { Component, Watch } from 'vue-property-decorator'
 import { State, Getter, Action } from 'vuex-class'
 import eventBus from '../utils/eventBus'
-import { urlJoin } from '../utils/util'
+import { urlJoin, getAuthUrl } from '../utils/util'
 import compilePath from '../utils/pathExp'
 
 @Component({
@@ -55,9 +53,9 @@ export default class Index extends Vue {
     @Getter onlineProjectList
     @Getter approvalingProjectList
     @Action closePreviewTips
+    @Action getPermissionUrl
 
     showLoginDialog: boolean = false
-    permUrl: string = `${APPLY_PROJECT_URL}`
     showExplorerTips: string = localStorage.getItem('showExplorerTips')
 
     get loadingOption(): object {
@@ -99,6 +97,22 @@ export default class Index extends Vue {
     
     switchProject() {
         this.iframeUtil.toggleProjectMenu(true)
+    }
+
+    async joinProject() {
+        const projectId = this.$route.params.projectId || 'projectNotExist'
+        const params = getAuthUrl(projectId)
+        try {
+            const res = await this.getPermissionUrl(params)
+            if (res && res.url) {
+                window.open(res.url, '_blank')
+            }
+        } catch (err) {
+            this.$bkMessage({
+                theme: 'error',
+                message: err.message || err
+            })
+        }
     }
 
     closeExplorerTips() {

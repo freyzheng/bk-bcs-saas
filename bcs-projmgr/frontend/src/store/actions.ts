@@ -122,6 +122,9 @@ const actions: ActionTree<RootState, any> = {
     },
     getAnnouncement({ commit }) {
         return Request.get(`${SUPPORT_API_URL_PREFIX}/user/notice/valid`)
+    },
+    getPermissionUrl({ commit }, params) {
+        return Request.post(`${AUTHORITY_CENTER_URL}/api/v1/apply-permission/url/`, params)
     }
 }
 

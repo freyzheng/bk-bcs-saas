@@ -63,8 +63,9 @@
                                 </td>
                                 <td class="action">
                                     <template>
-                                        <a href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" @click.stop.prevent="togglePMDialog(true, project)">{{ $t('projectTable.edit') }}</a>
-                                        <a href="javascript:void(0)" @click="goUserManager(project.project_code)" class="bk-text-button">{{ $t('projectTable.auth') }}</a>
+                                        <a v-if="project.permission === false" href="javascript:void(0)" @click="applyJoin(project.project_code)" class="bk-text-button">{{ $t('pageTips.joinProject') }}</a>
+                                        <a v-else href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" @click.stop.prevent="togglePMDialog(true, project)">{{ $t('projectTable.edit') }}</a>
+                                        <!--<a href="javascript:void(0)" @click="goUserManager(project.project_code)" class="bk-text-button">{{ $t('projectTable.auth') }}</a>-->
                                     </template>
                                 </td>
                             </tr>
@@ -86,9 +87,9 @@
                     <i class="bk-icon icon-plus"></i>
                     <span style="margin-left: 0;">{{ $t('addProject') }}</span>
                 </button>
-                <a class="bk-button bk-success" :href="applyProjectUrl">
+                <!--<a class="bk-button bk-success" :href="applyProjectUrl">
                     <span style="margin-left: 0;">{{ $t('pageTips.joinProject') }}</span>
-                </a>
+                </a>-->
             </empty-tips>
         </div>
         <logo-dialog :showDialog='showlogoDialog' :toConfirmLogo="toConfirmLogo" :toCloseDialog="toCloseDialog" :fileChange="fileChange" :selectedUrl="selectedUrl" :isUploading="isUploading">
@@ -115,6 +116,7 @@ import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { State, Action } from 'vuex-class'
 import logoDialog from '../components/logoDialog/index.vue'
+import { getAuthUrl } from '../utils/util'
 
 @Component({
     components: {
@@ -128,8 +130,8 @@ export default class ProjectManage extends Vue {
     @Action ajaxUpdatePM
     @Action getProjects
     @Action changeProjectLogo
+    @Action getPermissionUrl
 
-    applyProjectUrl: string = `${APPLY_PROJECT_URL}`
     isFilterByOffline: boolean = false
     showlogoDialog: boolean = false
     isUploading: boolean = false
@@ -245,8 +247,19 @@ export default class ProjectManage extends Vue {
         window.open(`/console/bcs/${project_code}/cluster?v`, '_self')
     }
 
-    goUserManager() {
-        window.open(USER_MANAGER_URL)
+    async applyJoin(projectCode: string) {
+        const params = getAuthUrl(projectCode)
+        try {
+            const res = await this.getPermissionUrl(params)
+            if (res && res.url) {
+                window.open(res.url, '_blank')
+            }
+        } catch (err) {
+            this.$bkMessage({
+                theme: 'error',
+                message: err.message || err
+            })
+        }
     }
 
     formatDate(dateStr: string): string {
