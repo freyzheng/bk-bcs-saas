@@ -20,4 +20,4 @@ var BCS_IFRAME_URL = "http://bcs.bk.com" //容器服务iframe地址
 
 var MONITOR_IFRAME_URL = "http://paas.bk.com/o/bk_bcs_monitor" //监控中心服务地址
 
-var AUTHORITY_CENTER_URL = 'http://paas.bk.com/o/bk_iam_app/my-perm'
+var AUTHORITY_CENTER_URL = 'http://paas.bk.com/o/bk_iam_app'
