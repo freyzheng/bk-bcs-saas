@@ -196,7 +196,7 @@ export function getAuthPermissionItem (obj) {
         "scope_id": "bk_bcs_app",
         "scope_type": "system",
         "resource_type": "bcs_project",
-        "action_id": 'view',
+        "action_id": 'manage',
         "resources": []
     }
     return Object.assign(base, item)
