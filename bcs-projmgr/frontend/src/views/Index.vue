@@ -65,7 +65,7 @@ export default class Index extends Vue {
     }
 
     get hasProject(): boolean {
-        return this.projectList.some(project => project.project_code === this.$route.params.projectId)
+        return this.projectList.some(project => project.project_code === this.$route.params.projectId && project.permission !== false)
     }
 
     get isOfflineProject(): boolean {
