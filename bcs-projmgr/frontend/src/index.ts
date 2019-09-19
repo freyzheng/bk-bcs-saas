@@ -32,7 +32,7 @@ import ShowTooltip from './components/ShowTooltip/index.vue'
 import iframeUtil from './utils/iframeUtil'
 import Cookies from 'js-cookie'
 
-import zh from './common/lang/zh.js'
+import cn from './common/lang/zh.js'
 import en from './common/lang/en.js'
 
 import VeeValidate from 'vee-validate'
@@ -46,16 +46,16 @@ import './assets/scss/index'
 
 import VueI18n from 'vue-i18n'
 
-// Cookies.set('blueking_language', 'zh')
+Cookies.set('blueking_language', 'zh-CN')
 
-const lang = Cookies.get('blueking_language') && Cookies.get('blueking_language') === 'en' ? 'en' : 'zh'
+const lang = Cookies.get('blueking_language') && Cookies.get('blueking_language') === 'en-US' ? 'en-US' : 'zh-CN'
 
 Vue.use(VueI18n)
 
 // @ts-ignore
 Vue.use(VeeValidate, {
     fieldsBagName: 'veeFields',
-    locale: lang === 'en' ? 'en' : 'cn'
+    locale: lang === 'en-US' ? 'en' : 'cn'
 })
 
 VeeValidate.Validator.localize(validDictionary)
@@ -76,10 +76,15 @@ judgementLsVersion()
 const i18n = new VueI18n({
     locale: lang,
     messages: {
-      zh,
-      en
+        // @ts-ignore
+        'zh-CN': Object.assign(window.bkMagic.langPkg.zhCN, cn),
+        // @ts-ignore
+        'en-US': Object.assign(window.bkMagic.langPkg.enUS, en),
     }
 })
+
+// @ts-ignore
+window.bkMagic.locale.i18n((key, value) => i18n.t(key, value))  
 
 window.devops = new Vue({
     el: "#devops-root",
