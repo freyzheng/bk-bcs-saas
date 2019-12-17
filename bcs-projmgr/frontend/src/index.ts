@@ -46,7 +46,7 @@ import './assets/scss/index'
 
 import VueI18n from 'vue-i18n'
 
-Cookies.set('blueking_language', 'zh-CN')
+// Cookies.set('blueking_language', 'zh-CN')
 
 const lang = Cookies.get('blueking_language') && Cookies.get('blueking_language') === 'en-US' ? 'en-US' : 'zh-CN'
 
