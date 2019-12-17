@@ -102,7 +102,7 @@ class UserProjectService constructor(
             return list
         } catch (e: Exception) {
             logger.warn("Fail to get the project list with token - $bkToken", e)
-            throw CustomException(Response.Status.INTERNAL_SERVER_ERROR, "获取项目列表失败")
+            throw CustomException(Response.Status.INTERNAL_SERVER_ERROR, "Failed to get project list.")
         } finally {
             jmxApi.execute(JmxApi.PROJECT_LIST, System.currentTimeMillis() - startEpoch, success)
             logger.info("It took ${System.currentTimeMillis() - startEpoch}ms to list projects")
@@ -122,7 +122,7 @@ class UserProjectService constructor(
             success = true
             return list
         } catch (e: Exception) {
-            throw CustomException(Response.Status.INTERNAL_SERVER_ERROR, "获取项目列表失败")
+            throw CustomException(Response.Status.INTERNAL_SERVER_ERROR, "Failed to get project list.")
         } finally {
             jmxApi.execute(JmxApi.PROJECT_LIST, System.currentTimeMillis() - startEpoch, success)
             logger.info("It took ${System.currentTimeMillis() - startEpoch}ms to list projects")
@@ -142,7 +142,7 @@ class UserProjectService constructor(
             success = true
             return projectInfo
         } catch (e: Exception) {
-            throw CustomException(Response.Status.INTERNAL_SERVER_ERROR, "获取项目列表失败")
+            throw CustomException(Response.Status.INTERNAL_SERVER_ERROR, "Failed to get project list.")
         } finally {
             jmxApi.execute(JmxApi.PROJECT_LIST, System.currentTimeMillis() - startEpoch, success)
             logger.info("It took ${System.currentTimeMillis() - startEpoch}ms to list projects")
@@ -163,7 +163,7 @@ class UserProjectService constructor(
             success = true
             return projectInfo
         } catch (e: Exception) {
-            throw CustomException(Response.Status.INTERNAL_SERVER_ERROR, "获取项目列表失败")
+            throw CustomException(Response.Status.INTERNAL_SERVER_ERROR, "Failed to get project list.")
         } finally {
             jmxApi.execute(JmxApi.PROJECT_LIST, System.currentTimeMillis() - startEpoch, success)
             logger.info("It took ${System.currentTimeMillis() - startEpoch}ms to list projects")
@@ -217,7 +217,7 @@ class UserProjectService constructor(
                     }
                 } catch (e: DuplicateKeyException) {
                     logger.warn("Duplicate project $projectCreateInfo", e)
-                    throw OperationException("项目名或者英文名重复")
+                    throw OperationException("Project Name or Project Code is dumplicate.")
                 } catch (t: Throwable) {
                     logger.warn("Fail to create the project ($projectCreateInfo)", t)
                     xBkAuthResourceApi.deleteResource(XBkAuthSystemCode.DEVOPS_PROJECT, XBkAuthScopeType.SYSTEM,
@@ -275,7 +275,7 @@ class UserProjectService constructor(
                     xBkAuthResourceApi.modifyResource(XBkAuthSystemCode.DEVOPS_PROJECT,
                             XBkAuthScopeType.SYSTEM, XBkAuthSystemCode.DEVOPS_PROJECT.value,
                             XBkAuthResourceType.PROJECT, resourceId, projectUpdateInfo.project_name)
-                    throw OperationException("项目名或英文名重复")
+                    throw OperationException("Project Name or Project Code is dumplicate.")
                 }
 
 
@@ -285,7 +285,7 @@ class UserProjectService constructor(
             }
         } else {
             logger.warn("ProjectID is invalid")
-            throw OperationException("项目id无效")
+            throw OperationException("Project Id is invalid.")
         }
         return Result(success)
     }
@@ -321,13 +321,13 @@ class UserProjectService constructor(
                 }
             } catch (e: Exception) {
                 logger.warn("fail update projectLogo", e)
-                throw OperationException("更新项目logo失败")
+                throw OperationException("Failed to update project logo.")
             } finally {
                 logoFile?.delete()
             }
         } else {
             logger.warn("$project is null or $project is empty")
-            throw OperationException("查询不到有效的项目")
+            throw OperationException("Can not found  project")
         }
         return Result(true)
     }
@@ -348,34 +348,34 @@ class UserProjectService constructor(
             projectId: String? = null
     ) {
         if (name.isBlank()) {
-            throw OperationException("名称不能为空")
+            throw OperationException("Project Name can not be null.")
         }
         when (validateType) {
             ProjectValidateType.project_name -> {
                 if (name.length < 4) {
-                    throw OperationException("项目名至少4个字符")
+                    throw OperationException("Project Name must more than 4 characters.")
                 }
                 if (name.length > 12) {
-                    throw OperationException("项目名至多12个字符")
+                    throw OperationException("Project Name must less than 12 characters.")
                 }
                 if (projectDao.existByProjectName(dslContext, name, projectId)) {
-                    throw OperationException("项目名已经存在")
+                    throw OperationException("Project name is existed")
                 }
             }
             ProjectValidateType.english_name -> {
                 // 2 ~ 32 个字符+数字，以小写字母开头
                 if (name.length < 2) {
-                    throw OperationException("英文名长度至少2个字符")
+                    throw OperationException("Project Code must more than 2 characters.")
                 }
                 if (name.length > 32) {
-                    throw OperationException("英文名长度最多不能超过32个字符")
+                    throw OperationException("Project Code must less than 32 characters.")
                 }
                 if (!Pattern.matches(ENGLISH_NAME_PATTERN, name)) {
                     logger.warn("Project English Name($name) is not match")
-                    throw OperationException("英文名是字符+数字组成，并以小写字母开头")
+                    throw OperationException("English name is composed of characters + numbers and starts with lowercase letters.")
                 }
                 if (projectDao.existByEnglishName(dslContext, name, projectId)) {
-                    throw OperationException("英文名已经存在")
+                    throw OperationException("Project Code already exists.")
                 }
             }
         }
