@@ -46,16 +46,15 @@ import './assets/scss/index'
 
 import VueI18n from 'vue-i18n'
 
-// Cookies.set('blueking_language', 'zh-CN')
-
-const lang = Cookies.get('blueking_language') && Cookies.get('blueking_language') === 'en-US' ? 'en-US' : 'zh-CN'
+const enArr: any = ['en', 'EN', 'ENGLISH', 'english', 'en-US']
+const lang = Cookies.get('blueking_language') && enArr.includes(Cookies.get('blueking_language')) ? 'en' : 'zh-CN'
 
 Vue.use(VueI18n)
 
 // @ts-ignore
 Vue.use(VeeValidate, {
     fieldsBagName: 'veeFields',
-    locale: lang === 'en-US' ? 'en' : 'cn'
+    locale: lang === 'en' ? 'en' : 'cn'
 })
 
 VeeValidate.Validator.localize(validDictionary)
@@ -79,7 +78,7 @@ const i18n = new VueI18n({
         // @ts-ignore
         'zh-CN': Object.assign(window.bkMagic.langPkg.zhCN, cn),
         // @ts-ignore
-        'en-US': Object.assign(window.bkMagic.langPkg.enUS, en),
+        'en': Object.assign(window.bkMagic.langPkg.enUS, en)
     }
 })
 
