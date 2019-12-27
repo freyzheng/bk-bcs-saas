@@ -14,7 +14,7 @@ export default {
         englishName: 'English Name',
         desc: 'Description',
         creator: 'Creator',
-        operation: 'Operation',
+        operation: 'Actions',
         edit: 'Edit Project',
         auth: 'Auth'
     },
