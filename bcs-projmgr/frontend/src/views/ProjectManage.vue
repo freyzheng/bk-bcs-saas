@@ -64,7 +64,7 @@
                                 <td class="action">
                                     <template>
                                         <a v-if="project.permission === false" href="javascript:void(0)" @click="applyJoin(project.project_code)" class="bk-text-button">{{ $t('pageTips.joinProject') }}</a>
-                                        <a v-else href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" @click.stop.prevent="togglePMDialog(true, project)">{{ $t('projectTable.edit') }}</a>
+                                        <a v-else href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}, {'en-underline': isEn}]" @click.stop.prevent="togglePMDialog(true, project)">{{ $t('projectTable.edit') }}</a>
                                         <!--<a href="javascript:void(0)" @click="goUserManager(project.project_code)" class="bk-text-button">{{ $t('projectTable.auth') }}</a>-->
                                     </template>
                                 </td>
@@ -117,6 +117,7 @@ import { Component, Watch } from 'vue-property-decorator'
 import { State, Action } from 'vuex-class'
 import logoDialog from '../components/logoDialog/index.vue'
 import { getAuthUrl } from '../utils/util'
+import Cookies from 'js-cookie'
 
 @Component({
     components: {
@@ -151,6 +152,11 @@ export default class ProjectManage extends Vue {
         show: false
     }
     matchColorList: any = ['green', 'yellow', 'red', 'blue']
+
+    get isEn (): Boolean {
+        const enArr: any = ['en', 'EN', 'ENGLISH', 'english', 'en-US']
+        return Cookies.get('blueking_language') && enArr.includes(Cookies.get('blueking_language')) ? true : false
+    }
 
     @Watch('isFilterByOffline')
     watchFilterOffline(isFilterByOffline: boolean): void {
@@ -526,6 +532,10 @@ export default class ProjectManage extends Vue {
     }
     .action {
         text-align: center;
+        .en-underline:hover {
+            border-bottom: 1px solid #3c96ff;
+            padding-bottom: 3px;
+        }
     }
     .time {
         color: #a3a4ac;
