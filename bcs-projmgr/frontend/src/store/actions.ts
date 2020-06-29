@@ -62,7 +62,8 @@ const actions: ActionTree<RootState, any> = {
         return Request.post(`${PROCESS_API_URL_PREFIX}/user/accesses/`, payload)
     },
     async getProjects({ commit }) {
-        const projectList = await Request.get(`${PROJECT_API_URL_PREFIX}/user/projects/`)
+        // const projectList = await Request.get(`${PROJECT_API_URL_PREFIX}/user/projects/`)
+        const projectList = await Request.get(`${PROJECT_API_URL_PREFIX}/projects/`)
         commit(SET_PROJECT_LIST, { projectList })
     },
     checkProjectField({ commit }, { field, value, projectId }) {
@@ -76,10 +77,10 @@ const actions: ActionTree<RootState, any> = {
         return Request.get(`${PROJECT_API_URL_PREFIX}/user/organizations/types/${type}/ids/${id}`)
     },
     ajaxUpdatePM({ commit }, { id, data }) {
-        return Request.put(`${PROJECT_API_URL_PREFIX}/user/projects/${id}/`, data)
+        return Request.put(`${PROJECT_API_URL_PREFIX}/projects/${id}/`, data)
     },
     ajaxAddPM({ commit }, data) {
-        return Request.post(`${PROJECT_API_URL_PREFIX}/user/projects/`, data)
+        return Request.post(`${PROJECT_API_URL_PREFIX}/projects/`, data)
     },
     async ajaxCheckProjectId({ commit }, hrefId) {
         const projectInfo = await Request.get(`${PROJECT_API_URL_PREFIX}/user/projects/getProjectByCode/${hrefId}`)

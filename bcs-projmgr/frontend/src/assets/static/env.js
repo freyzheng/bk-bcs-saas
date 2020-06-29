@@ -11,7 +11,7 @@
  */
 
 var LOGIN_SERVICE_URL = 'http://paas.bk.com/login' // 登录域名前缀
-var GW_URL_PREFIX = 'http://api.dev.bcs.bk.com' // api接口前缀
+var GW_URL_PREFIX = 'http://paas.bk.com/o/bk_bcs_app' // api接口前缀
 var DEVOPS_LS_VERSION = 'dev' // 最近访问服务版本
 var AUTHORITY_CENTER_URL = 'http://paas.bk.com/o/bk_iam_app'
 var BCS_DOCS_URL = 'https://bk.tencent.com/docs/' // 容器文档地址s

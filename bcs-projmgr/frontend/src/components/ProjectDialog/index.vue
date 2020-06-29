@@ -6,7 +6,6 @@
             <div class='bk-form-item is-required'>
                 <label class='bk-label'>{{ $t('projectTable.name') }}：</label>
                 <div class='bk-form-content'>
-                    <!-- projectNameUnique: [ newProject.project_id ] -->
                     <input type='text' maxlength='12' class='bk-form-input' :class="{'is-danger': errors.has('project_name')}" :value='newProject.project_name' name='project_name' v-validate='{required: true, min: 4, max: 12}' @input='handleProjectChange' :placeholder="$t('projectDialog.namePlaceholder')" />
                     <div class='error-tips' v-if='errors.has("project_name")'>
                         {{ errors.first("project_name") }}
@@ -77,7 +76,6 @@ export default class ProjectDialog extends Vue {
     @State showProjectDialog
     @Getter isEmptyProject
     @Action updateNewProject
-    @Action checkProjectField
     @Action toggleProjectDialog
     @Action ajaxUpdatePM
     @Action ajaxAddPM
@@ -120,11 +118,10 @@ export default class ProjectDialog extends Vue {
     }
 
     async addProject(data) {
-        // let data = this.newProject
         try {
             let res = await this.ajaxAddPM(data)
 
-            if (typeof res === 'boolean' && res) {
+            if (res) {
                 this.$bkMessage({
                     theme: 'success',
                     message: this.$t('projectDialog.addSuccessTips')
@@ -142,10 +139,22 @@ export default class ProjectDialog extends Vue {
                 this.isCreating = false
             }, 100)
         } catch (err) {
-            this.$bkMessage({
-                theme: 'error',
-                message: err.message || this.$t('projectDialog.apiErrorTips')
-            })
+            if (err.code === 4003) {
+                // 弹窗显示无权限
+                this.$showAskPermissionDialog({
+                    noPermissionList: [{
+                        resource: this.$t('project'),
+                        option: this.$t('create')
+                    }],
+                    applyPermissionUrl: (err.data && err.data.apply_url) || ''
+                })
+            } else {
+                this.$bkMessage({
+                    theme: 'error',
+                    message: err.message || this.$t('projectDialog.apiErrorTips')
+                })
+            }
+            
             setTimeout(() => {
                 this.isCreating = false
             }, 100)
@@ -172,11 +181,22 @@ export default class ProjectDialog extends Vue {
                 this.isCreating = false
             }, 100)
         } catch (err) {
-            let message = err.message || this.$t('projectDialog.apiErrorTips')
-            this.$bkMessage({
-                theme: 'error',
-                message
-            })
+            if (err.code === 4003) {
+                // 弹窗显示无权限
+                this.$showAskPermissionDialog({
+                    noPermissionList: [{
+                        resource: this.$t('project'),
+                        option: this.$t('edit')
+                    }],
+                    applyPermissionUrl: (err.data && err.data.apply_url) || ''
+                })
+            } else {
+                let message = err.message || this.$t('projectDialog.apiErrorTips')
+                this.$bkMessage({
+                    theme: 'error',
+                    message
+                })
+            }
             setTimeout(() => {
                 this.isCreating = false
             }, 100)

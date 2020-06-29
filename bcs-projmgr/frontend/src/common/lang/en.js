@@ -9,6 +9,10 @@ export default {
     chooseProject: 'Please choose a project',
     searchTips: 'Search Keywords',
     logout: 'Logout',
+    noPermission: "No Permission",
+    resource: "Resource",
+    permissionToApply: "Permission To Apply",
+    toApply: "To Apply",
     projectTable: {
         name: 'Project Name',
         englishName: 'English Name',
