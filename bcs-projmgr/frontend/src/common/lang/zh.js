@@ -9,6 +9,13 @@ export default {
     chooseProject: '请选择项目',
     searchTips: '输入关键字按Enter搜索',
     logout: '退出',
+    noPermission: "无权限操作",
+    resource: "资源",
+    permissionToApply: "需要申请的权限",
+    toApply: "去申请",
+    create: "创建",
+    edit: "编辑",
+    project: "项目",
     projectTable: {
         name: '项目名称',
         englishName: '项目英文名',

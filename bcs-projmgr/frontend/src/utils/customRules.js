@@ -23,7 +23,6 @@ const customeRules = {
             return new Promise(async (resolve, reject) => {
                 try {
                     const response = await eventBus.$ajax.put(`${PROJECT_API_URL_PREFIX}/user/projects/project_name/names/${value}/validate/${projectId ? `?project_id=${projectId}` : ''}`)
-                    console.log(response)
                     resolve({
                         valid: response
                     })
@@ -42,9 +41,9 @@ const customeRules = {
         validate: function (value) {
             return new Promise(async (resolve, reject) => {
                 try {
-                    const response = await eventBus.$ajax.put(`${PROJECT_API_URL_PREFIX}/user/projects/english_name/names/${value}/validate/`)
+                    const response = await eventBus.$ajax.get(`${PROJECT_API_URL_PREFIX}/projects/?project_code=${value}&with_permission_field=false`)
                     resolve({
-                        valid: response
+                        valid: typeof response === 'object' && Object.keys(response).length === 0
                     })
                 } catch (e) {
                     console.log(e)

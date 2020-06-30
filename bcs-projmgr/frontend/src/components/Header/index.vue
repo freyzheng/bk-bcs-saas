@@ -136,7 +136,7 @@ export default class Header extends Vue {
         eventBus.$on('show-project-dialog', (project: Project) => {
             this.popProjectDialog(project)
         })
-        this.checkProjectId()
+        // this.checkProjectId()
     }
 
     handleDropdownVisible(isShow: boolean): void {
