@@ -48,7 +48,7 @@ export default {
         noPermissionDesc: 'Please try to switch another project, or join the project',
         noFoundProject: 'Temporarily no data',
         noProjectTitle: 'Did not find the project you joined',
-        npProjectDesc: 'You can create your own project or apply to join an existing project'
+        noProjectDesc: 'You can create your own project or apply to join an existing project'
     },
     flowTips: {
         websiteUrl: 'Blueking Offcial Website',

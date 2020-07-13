@@ -4,22 +4,11 @@
             <Header />
             <main>
                 <template v-if='hasProjectList'>
-                    <empty-tips v-if='!hasProject' :title="`${$t('pageTips.noPermissionTitlePrefix')}${hrefProjectId}${$t('pageTips.noPermissionTitleSuffix')}`" :desc="$t('pageTips.noPermissionDesc')">
+                    <empty-tips v-if='!hasProject' :title="`${$t('pageTips.noPermissionTitlePrefix')}${$t('pageTips.noPermissionTitleSuffix')}`" :desc="$t('pageTips.noPermissionDesc')">
 
                         <bk-button type='primary' @click='switchProject'>{{ $t('pageTips.switchProject') }}</bk-button>
                         <bk-button type='success' @click='joinProject'>{{ $t('pageTips.joinProject') }}</bk-button>
                     </empty-tips>
-
-                    <!--<empty-tips v-else-if='isOfflineProject' title='项目已禁用' desc='该项目已被禁用，请切换项目试试，或重新启用该项目'>
-                        <bk-button type='primary' @click='switchProject'>切换项目</bk-button>
-                        <a target="_blank" class='empty-btns-item' href='/console/pm'>
-                            <bk-button type='success'>项目管理</bk-button>
-                        </a>
-                    </empty-tips>-->
-
-                    <!--<empty-tips v-else-if='isApprovalingProject' title='无法访问该项目' desc='你正在访问的项目正在处于审核中，禁止访问'>
-                        <bk-button type='primary' @click='switchProject'>切换项目</bk-button>
-                    </empty-tips>-->
                 </template>
                 <router-view v-if='!hasProjectList || isOnlineProject || isApprovalingProject'></router-view>
             </main>
@@ -46,13 +35,11 @@ import compilePath from '../utils/pathExp'
     }
 })
 export default class Index extends Vue {
-    @State hrefProjectId
     @State projectList
     @State headerConfig
     @State isShowPreviewTips
     @Getter onlineProjectList
     @Getter approvalingProjectList
-    @Action closePreviewTips
     @Action getPermissionUrl
 
     showLoginDialog: boolean = false
@@ -100,24 +87,7 @@ export default class Index extends Vue {
     }
 
     async joinProject() {
-        const projectId = this.$route.params.projectId || 'projectNotExist'
-        const params = getAuthUrl(projectId)
-        try {
-            const res = await this.getPermissionUrl(params)
-            if (res && res.url) {
-                window.open(res.url, '_blank')
-            }
-        } catch (err) {
-            this.$bkMessage({
-                theme: 'error',
-                message: err.message || err
-            })
-        }
-    }
-
-    closeExplorerTips() {
-        localStorage.setItem('showExplorerTips', 'false')
-        this.closePreviewTips()
+        location.href = '/console'
     }
 
     saveProjectId(): void {
