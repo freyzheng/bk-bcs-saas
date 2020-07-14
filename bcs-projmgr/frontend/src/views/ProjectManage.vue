@@ -25,27 +25,23 @@
                                 <th style="width: 300px;border-bottom:none">{{ $t('projectTable.name') }}</th>
                                 <th style="width: 300px;border-bottom:none">{{ $t('projectTable.englishName') }}</th>
                                 <th>{{ $t('projectTable.desc') }}</th>
-                                <th style="width: 170px;">{{ $t('projectTable.creator') }}</th>
+                                <th style="width: 100px;">{{ $t('projectTable.creator') }}</th>
                                 <th style="width: 200px; text-align: center;">{{ $t('projectTable.operation') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="project in curPageData" :key="project.project_code">
                                 <td>
-                                    <!-- @click="modifyLogo(project)" -->
                                     <span class="avatar" v-if="project.logo_addr">
                                         <img class="avatar-addr" :src="project.logo_addr">
-                                        <!-- <span class="bg-avatar">编辑</span> -->
                                     </span>
-                                    <!-- @click="modifyLogo(project)" -->
                                     <span class="avatar" v-else :class="['project-avatar', 'match-color-blue']">
                                         {{ project.project_name.substr(0, 1) }}
-                                        <!-- <span class="bg-avatar">编辑</span> -->
                                     </span>
                                     <div class="info">
                                         <p class="title">
                                             <template>
-                                                <a href="javascript:void(0)" @click.stop.prevent="goProject(project.project_code)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" v-if="!project.is_offlined">{{project.project_name}}</a>
+                                                <a href="javascript:void(0)" @click.stop.prevent="goProject(project)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" v-if="!project.is_offlined">{{project.project_name}}</a>
                                                 <a href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}]" v-else>{{project.project_name}}</a>
                                             </template>
                                         </p>
@@ -63,7 +59,7 @@
                                 </td>
                                 <td class="action">
                                     <template>
-                                        <a v-if="project.permission === false" href="javascript:void(0)" @click="applyJoin(project.project_code)" class="bk-text-button">{{ $t('pageTips.joinProject') }}</a>
+                                        <a v-if="project.permissions && !project.permissions.project_edit && !project.permissions.project_viewf" href="javascript:void(0)" @click="goProject(project)" class="bk-text-button">{{ $t('pageTips.joinProject') }}</a>
                                         <a v-else href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}, {'en-underline': isEn}]" @click.stop.prevent="togglePMDialog(true, project)">{{ $t('projectTable.edit') }}</a>
                                         <!--<a href="javascript:void(0)" @click="goUserManager(project.project_code)" class="bk-text-button">{{ $t('projectTable.auth') }}</a>-->
                                     </template>
@@ -92,22 +88,6 @@
                 </a>-->
             </empty-tips>
         </div>
-        <logo-dialog :showDialog='showlogoDialog' :toConfirmLogo="toConfirmLogo" :toCloseDialog="toCloseDialog" :fileChange="fileChange" :selectedUrl="selectedUrl" :isUploading="isUploading">
-        </logo-dialog>
-        <!-- <footer class="footer">
-            <p class="logo-qt">
-                <img class="img-logo" src="/static/home/images/qtlogo.png"><span>青藤云安全提供安全检测</span>
-            </p>
-            <p>
-                <a id="contact_us" class="link">QQ咨询(800802001)</a>
-                | <a href="http://bbs.bk.tencent.com/forum.php" target="_blank" hotrep="hp.footer.feedback" class="link">蓝鲸论坛</a>
-                | <a href="http://bk.tencent.com/" target="_blank" hotrep="hp.footer.feedback" class="link">蓝鲸官网</a>
-                | <a href="/" target="_blank" hotrep="hp.footer.feedback" class="link">蓝鲸智云工作台</a>
-                |<a class="follow-us" href="###">关注我们<span class="qr-box"><span class="qr"><img src="/static/home/images/qr.png"></span><span class="qr-caret"></span></span></a>
-            </p>
-            <p>Copyright © 2012-2019 Tencent BlueKing. All Rights Reserved.</p>
-            <p>蓝鲸智云 版权所有</p>
-        </footer> -->
     </div>
 </template>
 
@@ -115,32 +95,22 @@
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { State, Action } from 'vuex-class'
-import logoDialog from '../components/logoDialog/index.vue'
 import { getAuthUrl } from '../utils/util'
 import Cookies from 'js-cookie'
 
-@Component({
-    components: {
-        logoDialog
-    }
-})
+@Component({})
 export default class ProjectManage extends Vue {
     @State projectList
     @State newProject
     @Action toggleProjectDialog
     @Action ajaxUpdatePM
     @Action getProjects
-    @Action changeProjectLogo
     @Action getPermissionUrl
+    @Action getUserPerms
+    @Action getProjectPerms
 
     isFilterByOffline: boolean = false
-    showlogoDialog: boolean = false
-    isUploading: boolean = false
-    curProjectData: object
-    selectedFile: object
     isDataLoading: boolean = false
-    selectedUrl: string = ''
-    curSelectProject: string = ''
     inputValue: string = ''
     offlineProjectNum: number
     curProjectList: object[] = []
@@ -241,16 +211,82 @@ export default class ProjectManage extends Vue {
         this.curPageData = JSON.parse(JSON.stringify(data))
     }
 
-    togglePMDialog(show: boolean, project = null): void {
-        this.toggleProjectDialog({
+    // 点击新增或编辑项目
+    async togglePMDialog(show: boolean, project = null) {
+        let showEdit = false
+        let showPerm = false
+        let res = {}
+        if (show) {
+            try {
+                if (!project) {
+                    res = await this.getUserPerms({})
+                    // @ts-ignore
+                    if (res.project_create && !res.project_create.is_allowed && res.project_create.apply_url) {
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                resource: this.$t('project'), 
+                                option: this.$t('create')
+                            }],
+                            // @ts-ignore
+                            applyPermissionUrl: res.project_create.apply_url
+                        })
+                    } else {
+                        showEdit = true
+                    }
+                } else {
+                    res = await this.getProjectPerms({
+                        project_id: project.project_id,
+                        action_ids: ['project_edit']
+                    })
+                    // @ts-ignore
+                    if (res.project_edit && !res.project_edit.is_allowed && res.project_edit.apply_url) {
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                resource: this.$t('project'), 
+                                option: this.$t('edit')
+                            }],
+                            // @ts-ignore
+                            applyPermissionUrl: res.project_edit.apply_url
+                        })
+                    } else {
+                        showEdit = true
+                    }
+                }
+            } catch (err) {
+                this.$bkMessage({
+                    theme: 'error',
+                    message: err.message || err
+                })   
+            }
+        } else {
+            showEdit = true
+        }
+        showEdit && this.toggleProjectDialog({
             showProjectDialog: show,
             project
         })
     }
 
-    goProject(project_code: string): void {
-        // window.open(`/console/perm/my-project?project_code=${project_code}`, '_self')
-        window.open(`/console/bcs/${project_code}/cluster?v`, '_self')
+    async goProject(project: Project) {
+        // @ts-ignore
+        if (project && project.permissions && project.permissions.project_view) {
+            window.open(`/console/bcs/${project.project_code}/cluster?v`, '_self')
+        } else {
+            const res = await this.getProjectPerms({
+                project_id: project.project_id,
+                action_ids: ['project_view']
+            })
+            if (res.project_view && res.project_view.apply_url) {
+                this.$showAskPermissionDialog({
+                    noPermissionList: [{
+                        resource: this.$t('project'), 
+                        option: this.$t('view')
+                    }],
+                    applyPermissionUrl: res.project_view.apply_url
+                })
+            }
+        }
+        
     }
 
     async applyJoin(projectCode: string) {
@@ -280,151 +316,25 @@ export default class ProjectManage extends Vue {
         }
     }
 
-    offlineProject(project: any): void {
-        let _this = this
-        const { is_offlined, project_id } = project
-        this.curProjectData = JSON.parse(JSON.stringify(project))
+    // async updateProject(project: any) {
+    //     try {
+    //         const res = await this.ajaxUpdatePM(project)
 
-        const message = is_offlined ? '确定要启用？' : '确定要停用？'
+    //         this.$bkMessage({
+    //             theme: 'success',
+    //             message: this.$t('projectDialog.saveSuccessTips')
+    //         })
+    //         this.togglePMDialog(false)
+    //         this.getProjects()
+    //     } catch (e) {
+    //         this.$bkMessage({
+    //             message: e.message,
+    //             theme: 'error'
+    //         })
+    //     }
+    // }
 
-        this.$bkInfo({
-            title: message,
-            confirmFn() {
-                const params = {
-                    id: project_id,
-                    data: {
-                        is_offlined: !is_offlined
-                    }
-                }
-                _this.updateProject(params)
-                return true
-            }
-        })
-    }
-
-    matchForCode(project_code) {
-        let event = project_code.substr(0, 1)
-        let key = event.charCodeAt() % 4
-        return this.matchColorList[key]
-    }
-
-    modifyLogo(project) {
-        if (project.logo_addr) {
-            this.selectedUrl = project.logo_addr
-        } else {
-            this.selectedUrl = ''
-        }
-        this.showlogoDialog = true
-        this.isUploading = false
-        this.curSelectProject = project.project_id
-    }
-
-    async toConfirmLogo() {
-        if (this.selectedUrl && this.selectedFile) {
-            this.isUploading = true
-
-            let formData = new FormData()
-            formData.append('logo', this.selectedFile[0])
-
-            try {
-                const res = await this.changeProjectLogo({
-                    projectId: this.curSelectProject,
-                    formData
-                })
-
-                if (res) {
-                    this.$bkMessage({
-                        theme: 'success',
-                        message: 'LOGO修改成功！'
-                    })
-
-                    this.showlogoDialog = false
-                    this.projectList.forEach(item => {
-                        if (item.project_id === this.curSelectProject) {
-                            item.logo_addr = res.logo_addr
-                        }
-                    })
-                }
-            } catch (e) {
-                this.$bkMessage({
-                    message: e.message,
-                    theme: 'error'
-                })
-
-                this.isUploading = false
-            } finally {
-                this.selectedFile = undefined
-            }
-        } else if (!this.selectedUrl) {
-            this.$bkMessage({
-                message: '请选择要上传的图片',
-                theme: 'error'
-            })
-        } else {
-            this.showlogoDialog = false
-        }
-        this.resetUploadInput()
-    }
-
-    toCloseDialog() {
-        this.showlogoDialog = false
-        this.selectedFile = undefined
-        this.resetUploadInput()
-    }
-
-    fileChange(e): void {
-        let file = e.target.files[0]
-        if (file) {
-            if (!(file.type === 'image/jpeg' || file.type === 'image/png')) {
-                this.$bkMessage({
-                    theme: 'error',
-                    message: '请上传png、jpg格式的图片'
-                })
-            } else if (file.size > 2 * 1024 * 1024) {
-                this.$bkMessage({
-                    theme: 'error',
-                    message: '请上传大小不超过2M的图片'
-                })
-            } else {
-                let reader = new FileReader()
-                reader.readAsDataURL(file)
-                reader.onload = evts => {
-                    this.selectedUrl = evts.target.result
-                }
-                this.selectedFile = e.target.files
-            }
-        }
-    }
-
-    /**
-     * 清空input file的值
-     */
-    resetUploadInput() {
-        this.$nextTick(() => {
-            let inputElement = <HTMLInputElement>document.getElementById('inputfile')
-            inputElement.value = ''
-        })
-    }
-
-    async updateProject(project: any) {
-        try {
-            const res = await this.ajaxUpdatePM(project)
-
-            this.$bkMessage({
-                theme: 'success',
-                message: this.$t('projectDialog.saveSuccessTips')
-            })
-            this.togglePMDialog(false)
-            this.getProjects()
-        } catch (e) {
-            this.$bkMessage({
-                message: e.message,
-                theme: 'error'
-            })
-        }
-    }
-
-    created() {
+    async created() {
         this.initList()
         this.initPageConf()
     }

@@ -15,6 +15,7 @@ export default {
     toApply: "去申请",
     create: "创建",
     edit: "编辑",
+    view: "查看",
     project: "项目",
     projectTable: {
         name: '项目名称',
@@ -48,10 +49,10 @@ export default {
         joinProject: '申请加入',
         noPermissionTitlePrefix: '无',
         noPermissionTitleSuffix: '项目权限或者项目不存在',
-        noPermissionDesc: '请切换项目试试，或申请加入该项目',
+        noPermissionDesc: '请切换项目试试，或申请加入项目',
         noFoundProject: '暂时没有数据！',
         noProjectTitle: '未找到您参与的项目',
-        npProjectDesc: '您可以创建自己的项目，也可以申请加入已有的项目'
+        noProjectDesc: '您可以创建自己的项目，也可以申请加入已有的项目'
     },
     flowTips: {
         websiteUrl: '蓝鲸官网',

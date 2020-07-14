@@ -11,7 +11,6 @@
  */
 
 import {
-    REPOSITORY_API_URL_PREFIX,
     PROJECT_API_URL_PREFIX
 } from '../store/constants'
 import eventBus from './eventBus'
@@ -41,7 +40,7 @@ const customeRules = {
         validate: function (value) {
             return new Promise(async (resolve, reject) => {
                 try {
-                    const response = await eventBus.$ajax.get(`${PROJECT_API_URL_PREFIX}/projects/?project_code=${value}&with_permission_field=false`)
+                    const response = await eventBus.$ajax.get(`${PROJECT_API_URL_PREFIX}/projects/?project_code=${value}&with_permissions_field=false`)
                     resolve({
                         valid: typeof response === 'object' && Object.keys(response).length === 0
                     })

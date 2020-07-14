@@ -141,6 +141,7 @@ export default class ProjectDialog extends Vue {
         } catch (err) {
             if (err.code === 4003) {
                 // 弹窗显示无权限
+                this.closeDialog()
                 this.$showAskPermissionDialog({
                     noPermissionList: [{
                         resource: this.$t('project'),
@@ -183,6 +184,7 @@ export default class ProjectDialog extends Vue {
         } catch (err) {
             if (err.code === 4003) {
                 // 弹窗显示无权限
+                this.closeDialog()
                 this.$showAskPermissionDialog({
                     noPermissionList: [{
                         resource: this.$t('project'),
