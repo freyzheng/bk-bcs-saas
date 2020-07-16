@@ -108,7 +108,7 @@ export default class Header extends Vue {
 
     get selectProjectList(): Project[] {
         let list = this.projectList.filter(
-            item => (item.approval_status === 1 || item.approval_status === 2) && !item.is_offlined && item.permission !== false
+            item => !item.is_offlined && item.permissions && item.permissions.project_view
         )
         // console.log('==========================' + list)
         return list.sort(function(a, b) {
