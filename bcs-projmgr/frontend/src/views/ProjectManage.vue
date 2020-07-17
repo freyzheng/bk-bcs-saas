@@ -59,7 +59,7 @@
                                 </td>
                                 <td class="action">
                                     <template>
-                                        <a v-if="project.permissions && !project.permissions.project_edit && !project.permissions.project_viewf" href="javascript:void(0)" @click="goProject(project)" class="bk-text-button">{{ $t('pageTips.joinProject') }}</a>
+                                        <a v-if="project.permissions && !project.permissions.project_edit && !project.permissions.project_view" href="javascript:void(0)" @click="goProject(project)" class="bk-text-button">{{ $t('pageTips.joinProject') }}</a>
                                         <a v-else href="javascript:void(0)" :class="['bk-text-button', {'is-disabled': project.is_offlined}, {'en-underline': isEn}]" @click.stop.prevent="togglePMDialog(true, project)">{{ $t('projectTable.edit') }}</a>
                                         <!--<a href="javascript:void(0)" @click="goUserManager(project.project_code)" class="bk-text-button">{{ $t('projectTable.auth') }}</a>-->
                                     </template>
