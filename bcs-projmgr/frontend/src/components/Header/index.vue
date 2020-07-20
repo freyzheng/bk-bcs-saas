@@ -68,7 +68,8 @@ export default class Header extends Vue {
 
     @Action toggleProjectDialog
     @Action togglePopupShow
-    @Action ajaxCheckProjectId
+    @Action getUserPerms
+    @Action getProjectPerms
 
     isDropdownMenuVisible: boolean = false
     isShowTooltip: boolean = true
@@ -136,7 +137,6 @@ export default class Header extends Vue {
         eventBus.$on('show-project-dialog', (project: Project) => {
             this.popProjectDialog(project)
         })
-        // this.checkProjectId()
     }
 
     handleDropdownVisible(isShow: boolean): void {
@@ -144,11 +144,6 @@ export default class Header extends Vue {
             this.togglePopupShow(isShow)
         }
         this.isDropdownMenuVisible = isShow
-    }
-    checkProjectId() {
-        const arr = window.location.href.split('/')
-        let id = arr[arr.length - 2]
-        this.ajaxCheckProjectId(id)
     }
 
     goHome(): void {
@@ -209,8 +204,51 @@ export default class Header extends Vue {
         this.to('/console/')
     }
 
-    popProjectDialog(project: object): void {
-        this.toggleProjectDialog({
+    async popProjectDialog(project: Project) {
+        let showEdit = false
+        let res
+        try {
+            if (!project) {
+                res = await this.getUserPerms({})
+                // @ts-ignore
+                if (res.project_create && !res.project_create.is_allowed && res.project_create.apply_url) {
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            resource: this.$t('project'), 
+                            option: this.$t('create')
+                        }],
+                        // @ts-ignore
+                        applyPermissionUrl: res.project_create.apply_url
+                    })
+                } else {
+                    showEdit = true
+                }
+            } else {
+                res = await this.getProjectPerms({
+                    project_id: project.project_id,
+                    action_ids: ['project_edit']
+                })
+                // @ts-ignore
+                if (res.project_edit && !res.project_edit.is_allowed && res.project_edit.apply_url) {
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            resource: this.$t('project'), 
+                            option: this.$t('edit')
+                        }],
+                        // @ts-ignore
+                        applyPermissionUrl: res.project_edit.apply_url
+                    })
+                } else {
+                    showEdit = true
+                }
+            }
+        } catch (err) {
+            this.$bkMessage({
+                theme: 'error',
+                message: err.message || err
+            })   
+        }
+        showEdit && this.toggleProjectDialog({
             showProjectDialog: true,
             project
         })
