@@ -214,7 +214,6 @@ export default class ProjectManage extends Vue {
     // 点击新增或编辑项目
     async togglePMDialog(show: boolean, project = null) {
         let showEdit = false
-        let showPerm = false
         let res = {}
         if (show) {
             try {
@@ -315,24 +314,6 @@ export default class ProjectManage extends Vue {
             return '--'
         }
     }
-
-    // async updateProject(project: any) {
-    //     try {
-    //         const res = await this.ajaxUpdatePM(project)
-
-    //         this.$bkMessage({
-    //             theme: 'success',
-    //             message: this.$t('projectDialog.saveSuccessTips')
-    //         })
-    //         this.togglePMDialog(false)
-    //         this.getProjects()
-    //     } catch (e) {
-    //         this.$bkMessage({
-    //             message: e.message,
-    //             theme: 'error'
-    //         })
-    //     }
-    // }
 
     async created() {
         this.initList()
