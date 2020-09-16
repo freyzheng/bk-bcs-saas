@@ -34,7 +34,7 @@ export default class ConsultTools extends Vue {
             icon: 'icon-qq',
             label: this.$t('flowTips.qq'),
             href: 'https://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzgwMDgwMjAwMV80NDMwOTZfODAwODAyMDAxXzJf',
-            target: ''
+            target: '_blank'
         }]
     }
 
