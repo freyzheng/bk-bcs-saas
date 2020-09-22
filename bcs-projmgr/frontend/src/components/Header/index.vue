@@ -164,7 +164,7 @@ export default class Header extends Vue {
         if (type === 'bcs') {
             path = `/console/bcs/${id}/cluster?v`
         } else if (type === 'monitor') {
-            path = `/console/monitor/${id}/all-alarm`
+            path = `/console/monitor/${id}/`
         }
         this.$router.push({
             path: path,
